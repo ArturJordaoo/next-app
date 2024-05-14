@@ -1,0 +1,15 @@
+.navBar{
+  padding: 1rem 2rem;
+  color: white;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+.navItens{
+  display: flex;
+  flex-direction: column;
+}
+.logo{
+  width: 50%;
+  padding: 1.5rem;
+}
