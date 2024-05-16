@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 interface Pet {
@@ -12,28 +12,44 @@ interface Pet {
 }
 
 function SearchBox() {
-  const [query, setQuery] = useState("");
+  const [input, setInput] = useState("");
   const [results, setResults] = useState<Pet[]>([]);
+  const [debouncedInput, setDebouncedInput] = useState("");
 
-  const handleSearch = async (value: string) => {
-    setQuery(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedInput(input);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [input]);
+
+  const handleSearch = useCallback(async (value: string) => {
     try {
       const response = await axios.get<{ data: Pet[] }>(
         `https://nest-desafio-j1-artur.onrender.com/pets?q=${value}`
       );
-      setResults(response.data); // Changed this line
+      setResults(response.data.data); // Access the 'data' property of 'response.data'
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (debouncedInput) {
+      handleSearch(debouncedInput);
+    }
+  }, [debouncedInput, handleSearch]);
 
   return (
     <div>
       <input
         type="text"
         placeholder="Procure aqui"
-        value={query}
-        onChange={(e) => handleSearch(e.target.value)}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
       <ul>
         {results.map((result) => (
